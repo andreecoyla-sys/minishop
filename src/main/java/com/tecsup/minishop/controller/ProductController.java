@@ -18,19 +18,27 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping
-    public ResponseEntity<Product> create(@RequestBody Product product) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(productService.save(product));
-    }
-
     @GetMapping
-    public ResponseEntity<List<Product>> findAll() {
-        return ResponseEntity.ok(productService.findAll());
+    public List<Product> findAll() {
+        return productService.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.findById(id));
+        return productService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Product> save(@RequestBody Product product) {
+        Product savedProduct = productService.save(product);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        productService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
