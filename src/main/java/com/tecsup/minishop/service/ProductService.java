@@ -5,6 +5,7 @@ import com.tecsup.minishop.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -15,22 +16,25 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
+    public List<Product> findAll() {
+        return productRepository.findAll();
+    }
+
+    public Optional<Product> findById(Long id) {
+        return productRepository.findById(id);
+    }
+
     public Product save(Product product) {
-        if (product.getPrice() <= 0) {
-            throw new IllegalArgumentException("El precio debe ser mayor a cero");
+        if (product.getPrice() == null || product.getPrice() < 0) {
+            throw new IllegalArgumentException("El precio debe ser mayor a 0");
         }
-        if (product.getStock() < 0) {
+        if (product.getStock() == null || product.getStock() < 0) {
             throw new IllegalArgumentException("El stock no puede ser negativo");
         }
         return productRepository.save(product);
     }
 
-    public List<Product> findAll() {
-        return productRepository.findAll();
-    }
-
-    public Product findById(Long id) {
-        return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
+    public void deleteById(Long id) {
+        productRepository.deleteById(id);
     }
 }
